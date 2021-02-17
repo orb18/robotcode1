@@ -7,9 +7,9 @@ from threading import Thread
 import math
 import numpy as np
 
+saveaangles = [0, 0, 0, 0]
 
-saveangles = []
-
+#saveangles = []
 
 
 #import video.
@@ -29,7 +29,7 @@ def wingAverage(saveangles):
     oddTotal = 0
     turningNum = 0
 
-    for j in range(0, 8):
+    for j in range(0, 4):
         if int(saveangles[j]) > 0:
             evenTotal = evenTotal + 1
 
@@ -45,11 +45,11 @@ def wingAverage(saveangles):
         else:
             turningNum = 0
 
-    rorbotTurning(turningNum)
+    #rorbotTurning(turningNum)
 #-------------------------------------------------------------------
 
 
-
+"""""
 def rorbotTurning(turningNum):
     print('start...')
     #GPIO.setmode(GPIO.BOARD)
@@ -96,13 +96,12 @@ def rorbotTurning(turningNum):
     #GPIO.cleanup()
     print('end')
 
-
+"""
 
 
 yshift = -50  # Use these parameters to adjust the position of the fly in the image. Negative means moving left, positive moves it to the right
 xshift = -15
 
-saveangles = []
 
 def findanglel(upmost, bottommost,
                centre):  # Calculates the angle between the top and bottom of the wingbeat amplitude and the winghinge (centre)
@@ -233,13 +232,14 @@ class CountsPerSec:
         elapsed_time = (datetime.now() - self._start_time).total_seconds()
         return self._num_occurrences / elapsed_time if elapsed_time > 0 else 0
 
-def putIterationsPerSec(frame, iterations_per_sec):
+def putIterationsPerSec(frame, iterations_per_sec,counter):
     """
     Add iterations per second text to lower-left corner of a frame. It also includes the main video processing /wingbeat analysing part
     """
+
+    #global saveaangles
     w = 1280  # int
     h = 720  # int
-    global counter
     legcut = 100
     static_area_l = 2000  # preset value for static left wing from calibration, IMPORTANT as will be used as threshold for wingbeat envelope detection and calculation
     static_area_r = 1900  # preset value for static right wing from calibration
@@ -309,15 +309,15 @@ def putIterationsPerSec(frame, iterations_per_sec):
             deltaangle = 0
 
     print(deltaangle)
+    print(counter)
 
-
-    saveangles[counter] = deltaangle
-    counter = counter + 1
-    if counter == 8:
-        wingAverage(saveangles)
-        counter = 0
-    else:
-        counter = counter + 1
+    saveaangles[counter] = deltaangle
+   # counter = counter + 1
+    if counter == 3:
+        wingAverage(saveaangles)
+    #    counter = 0
+    #else:
+     #   counter = counter + 1
 
 
 
@@ -336,9 +336,15 @@ def threadVideoGet(source=0):
     st = time.time()
     period_goal = 0.01
     period = period_goal
+    counter = 0
+
     while True:  # Again the commented part is for displaying the video and calibration
+
+        counter = counter +1
+        if counter == 4:
+            counter = 0
         starttime = time.time()
-        putIterationsPerSec(video_getter.thr, cps.countsPerSec())
+        putIterationsPerSec(video_getter.thr, cps.countsPerSec(),counter)
         cps.increment()
         if cps._num_occurrences > 2500 or video_getter.stopped:
             print(time.time() - st)
