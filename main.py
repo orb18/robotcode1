@@ -30,6 +30,7 @@ def wingAverage(saveangles):
     turningNum = 0
 
     for j in range(0, 4):
+        #finding out how many even and odd deltaangles in the array to find out which way the fly is moving.
         if int(saveangles[j]) > 0:
             evenTotal = evenTotal + 1
 
@@ -45,12 +46,15 @@ def wingAverage(saveangles):
         else:
             turningNum = 0
 
-    #rorbotTurning(turningNum)
+    rorbotTurning(turningNum)
 #-------------------------------------------------------------------
 
 
-"""""
+
 def rorbotTurning(turningNum):
+    #this is the code which will turn the robot.
+    #isnt recognised on pyCharm so will need to do by trial and error with the robot itslef.
+    #if the robot isnt't flying shall we get the robot to stop moving completely???
     print('start...')
     #GPIO.setmode(GPIO.BOARD)
 
@@ -71,32 +75,31 @@ def rorbotTurning(turningNum):
         print('turning left')
         #GPIO.output(33, GPIO.HIGH)
         #GPIO.output(37, GPIO.HIGH)
-        time.sleep(3)
+        #time.sleep(3)
 
     elif turningNum == -1:
         print('turning right')
         #pwm0.ChangeDutyCycle(100)
         #pwm1.ChangeDutyCycle(40)
-        time.sleep(3)
+        #time.sleep(3)
 
     else:
         print('no turn')
         #pwm0.ChangeDutyCycle(100)
         #pwm1.ChangeDutyCycle(100)
-        time.sleep(3)
+        #time.sleep(3)
 
     #GPIO.output(33, GPIO.LOW)
     #GPIO.output(37, GPIO.LOW)
-    time.sleep(3)
+    #time.sleep(3)
 
     #GPIO.output(37, GPIO.LOW)
     #pwm0.stop()
     #pwm1.stop()
 
     #GPIO.cleanup()
-    print('end')
+    #print('end')
 
-"""
 
 
 yshift = -50  # Use these parameters to adjust the position of the fly in the image. Negative means moving left, positive moves it to the right
@@ -237,7 +240,8 @@ def putIterationsPerSec(frame, iterations_per_sec,counter):
     Add iterations per second text to lower-left corner of a frame. It also includes the main video processing /wingbeat analysing part
     """
 
-    #global saveaangles
+
+    #this function will work out the delta angle by utilising other fucntions (findanglel and findangler)
     w = 1280  # int
     h = 720  # int
     legcut = 100
@@ -252,8 +256,8 @@ def putIterationsPerSec(frame, iterations_per_sec,counter):
     leftangle = 0  # Variables storing angles of wingbeat
     rightangle = 0
 
-    kernel = np.ones((2, 2), np.uint8)
-    deltaangle = 0
+    kernel = np.ones((2, 2), np.uint8) # not sure what kernel does.
+    deltaangle = 0 #initialising the deltaangle for each loop around.
 
     ret, thr = cv2.threshold(frame, 20, 255, cv2.THRESH_BINARY)  # threshold to see the wing
 
@@ -284,7 +288,7 @@ def putIterationsPerSec(frame, iterations_per_sec,counter):
                     bottommost_l = tuple(cnt[cnt[:, :, 1].argmax()][0])
 
                     if upmost_l[1] < int(h / 2 / 2) and upmost_l[0] < (int(w / 2 / 2) - 5 - 0.6 * legcut):
-                        leftangle = findanglel(upmost_l, bottommost_l, hinge_l)
+                        leftangle = findanglel(upmost_l, bottommost_l, hinge_l) #jumps to the fuction and returns left angle
 
                     else:
                         leftangle = findanglel(leftmost, bottommost_l, hinge_l)
@@ -298,26 +302,28 @@ def putIterationsPerSec(frame, iterations_per_sec,counter):
                     if upmost_r[1] < int(h / 2 / 2) and upmost_r[0] > (
                             int(w / 2 / 2) - 5 + 0.6 * legcut):  # Same logic for the right wing
 
-                        rightangle = findangler(upmost_r, bottommost_r, hinge_r)
+                        rightangle = findangler(upmost_r, bottommost_r, hinge_r) #jumps to the function and returns right angle
                     else:
                         rightangle = findangler(rightmost, bottommost_r, hinge_r)
 
         deltaangle = leftangle - rightangle  # angular wingbeat amplitude difference in radians
+
+
+        #We may need to change this due to the sensetivity of each wing cycle
         if leftangle < math.radians(30) and abs(deltaangle) < 5:
             deltaangle = 0  # Not flapping, no significance
         elif rightangle < math.radians(30) and abs(deltaangle) < 5:
             deltaangle = 0
 
-    print(deltaangle)
-    print(counter)
+    print(deltaangle) # to make sure its outputing the correct angle
+    #print(counter)
 
-    saveaangles[counter] = deltaangle
-   # counter = counter + 1
+
+
+    saveaangles[counter] = deltaangle # saving the deltaangle to the correct array spot
     if counter == 3:
-        wingAverage(saveaangles)
-    #    counter = 0
-    #else:
-     #   counter = counter + 1
+        wingAverage(saveaangles) #jumping to the processing fucntion.
+        time.sleep(1) #we could put the sleep in a higher up fucntion to the robot and is only 1sec to exagerate.
 
 
 
@@ -339,11 +345,15 @@ def threadVideoGet(source=0):
     counter = 0
 
     while True:  # Again the commented part is for displaying the video and calibration
+        #this is the main while loop which will run until the video is finished.
 
+        #the counter will go from 0 to 3 to save and average 4 seperate wing beat angles to an array later on
         counter = counter +1
         if counter == 4:
+            #will need to reset the counter every 4 itterations.
             counter = 0
         starttime = time.time()
+        #now go to the next function:
         putIterationsPerSec(video_getter.thr, cps.countsPerSec(),counter)
         cps.increment()
         if cps._num_occurrences > 2500 or video_getter.stopped:
@@ -360,53 +370,7 @@ def threadVideoGet(source=0):
             period = period - (time.time() - starttime - period_goal)
 
 if __name__ == '__main__':
+    #program starts here.
+    #finds the attached .avi video and then goes to the threadVideoGet() function
     threadVideoGet("LuciliaSample.avi")
 
-
-
-
-
-
-
-
-
-
-
-
-
-#
-"""""
-if turningNum == 1:
-
-    pwm0.start(40)
-    pwm1.start(100)
-    print('truning left')
-    GPIO.output(33, GPIO.HIGH)
-    GPIO.output(37, GPIO.HIGH)
-    time.sleep(3)
-
-elif turningNum == -1:
-    print('truning right')
-    pwm0.ChangeDutyCycle(100)
-    pwm1.ChangeDutyCycle(40)
-    time.sleep(3)
-
-else:
-    print('no turn')
-    pwm0.ChangeDutyCycle(100)
-    pwm1.ChangeDutyCycle(100)
-    time.sleep(3)
-
-
-GPIO.output(33, GPIO.LOW)
-GPIO.output(37, GPIO.LOW)
-time.sleep(3)
-
-GPIO.output(37, GPIO.LOW)
-pwm0.stop()
-pwm1.stop()
-
-GPIO.cleanup()
-print('end')
-
-"""
