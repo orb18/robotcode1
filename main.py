@@ -55,50 +55,29 @@ def rorbotTurning(turningNum):
     #this is the code which will turn the robot.
     #isnt recognised on pyCharm so will need to do by trial and error with the robot itslef.
     #if the robot isnt't flying shall we get the robot to stop moving completely???
-    print('start...')
-    #GPIO.setmode(GPIO.BOARD)
 
-    #GPIO.setup(32, GPIO.OUT)
-    #GPIO.setup(33, GPIO.OUT)
-    #GPIO.setup(35, GPIO.OUT)
-    #GPIO.setup(36, GPIO.OUT)
-    #GPIO.setup(37, GPIO.OUT)
-    #GPIO.setup(38, GPIO.OUT)
-
-    #pwm0 = GPIO.PWM(32, 2000)
-    #pwm1 = GPIO.PWM(33, 20000)
 
     if turningNum == 1:
 
-        #pwm0.start(40)
-        #pwm1.start(100)
+
         print('turning left')
-        #GPIO.output(33, GPIO.HIGH)
-        #GPIO.output(37, GPIO.HIGH)
-        #time.sleep(3)
+        pwm0.ChangeDutyCycle(60)
+        pwm1.ChangeDutyCycle(40)
+        time.sleep(0.1)
 
     elif turningNum == -1:
         print('turning right')
-        #pwm0.ChangeDutyCycle(100)
-        #pwm1.ChangeDutyCycle(40)
-        #time.sleep(3)
+        pwm0.ChangeDutyCycle(40)
+        pwm1.ChangeDutyCycle(60)
+        time.sleep(0.1)
 
     else:
         print('no turn')
-        #pwm0.ChangeDutyCycle(100)
-        #pwm1.ChangeDutyCycle(100)
-        #time.sleep(3)
+        pwm0.ChangeDutyCycle(50)
+        pwm1.ChangeDutyCycle(50)
+        time.sleep(0.1)
 
-    #GPIO.output(33, GPIO.LOW)
-    #GPIO.output(37, GPIO.LOW)
-    #time.sleep(3)
 
-    #GPIO.output(37, GPIO.LOW)
-    #pwm0.stop()
-    #pwm1.stop()
-
-    #GPIO.cleanup()
-    #print('end')
 
 
 
@@ -344,6 +323,31 @@ def threadVideoGet(source=0):
     period = period_goal
     counter = 0
 
+
+    #we need to start the robot moving.
+
+    GPIO.setmode(GPIO.BOARD)
+
+    GPIO.setup(32, GPIO.OUT)
+    GPIO.setup(33, GPIO.OUT)
+    GPIO.setup(35, GPIO.OUT)
+    GPIO.setup(36, GPIO.OUT)
+    GPIO.setup(37, GPIO.OUT)
+    GPIO.setup(38, GPIO.OUT)
+
+    pwm0 = GPIO.PWM(32, 20000)
+    pwm1 = GPIO.PWM(33, 20000)
+
+    pwm0.start(50)
+    pwm1.start(50)
+
+
+    GPIO.output(36, GPIO.HIGH)
+    GPIO.output(35, GPIO.HIGH)
+    GPIO.output(38, GPIO.LOW)
+    GPIO.output(37, GPIO.LOW)
+
+    #robot is now moving in a stright line.
     while True:  # Again the commented part is for displaying the video and calibration
         #this is the main while loop which will run until the video is finished.
 
