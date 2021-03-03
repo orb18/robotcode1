@@ -23,7 +23,7 @@ saveaangles = [0, 0, 0, 0]
 
 
 
-def wingAverage(saveangles):
+def wingAverage(saveangles,pwm0,pwm1):
     #initialising the counters for each itteration
     evenTotal = 0
     oddTotal = 0
@@ -46,12 +46,12 @@ def wingAverage(saveangles):
         else:
             turningNum = 0
 
-    rorbotTurning(turningNum)
+    rorbotTurning(turningNum,pwm0,pwm1)
 #-------------------------------------------------------------------
 
 
 
-def rorbotTurning(turningNum):
+def rorbotTurning(turningNum,pwm0,pwm1):
     #this is the code which will turn the robot.
     #isnt recognised on pyCharm so will need to do by trial and error with the robot itslef.
     #if the robot isnt't flying shall we get the robot to stop moving completely???
@@ -214,7 +214,7 @@ class CountsPerSec:
         elapsed_time = (datetime.now() - self._start_time).total_seconds()
         return self._num_occurrences / elapsed_time if elapsed_time > 0 else 0
 
-def putIterationsPerSec(frame, iterations_per_sec,counter):
+def putIterationsPerSec(frame, iterations_per_sec,counter,pwm0,pwm1):
     """
     Add iterations per second text to lower-left corner of a frame. It also includes the main video processing /wingbeat analysing part
     """
@@ -301,7 +301,7 @@ def putIterationsPerSec(frame, iterations_per_sec,counter):
 
     saveaangles[counter] = deltaangle # saving the deltaangle to the correct array spot
     if counter == 3:
-        wingAverage(saveaangles) #jumping to the processing fucntion.
+        wingAverage(saveaangles,pwm0,pwm1) #jumping to the processing fucntion.
         time.sleep(1) #we could put the sleep in a higher up fucntion to the robot and is only 1sec to exagerate.
 
 
@@ -358,7 +358,7 @@ def threadVideoGet(source=0):
             counter = 0
         starttime = time.time()
         #now go to the next function:
-        putIterationsPerSec(video_getter.thr, cps.countsPerSec(),counter)
+        putIterationsPerSec(video_getter.thr, cps.countsPerSec(),counter,pwm0,pwm1)
         cps.increment()
         if cps._num_occurrences > 2500 or video_getter.stopped:
             print(time.time() - st)
